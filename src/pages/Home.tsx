@@ -68,7 +68,7 @@ const Event = () => {
   return (
     <div>
       <AddEventForm fetchEvents={fetchEvents}/>
-      <h2 className="text-center text-[36px] sm:text-[40px] my-10 sm:my-0 sm:mb-10 uppercase font-bold text-gray-900">{EVENT_LIST_TITLE_TEXT}</h2>
+      <h2 className="text-center text-[36px] sm:text-[40px] my-10 sm:my-0 sm:mb-10 uppercase font-semibold text-gray-900">{EVENT_LIST_TITLE_TEXT}</h2>
       <EventList />
       <Modal isOpen={isOpen}>
         { type === ModalType?.deleteConfModal && <ConfirmDeleteModal onConfirm={handleConfirmDelete}/>}
