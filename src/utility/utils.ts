@@ -3,3 +3,10 @@ export const updateDateFormat = (date:string): string => {
     const updatedDateFormat = newDate.toUTCString()
     return updatedDateFormat;
 }
+
+export const scrollToTop = ()=> {
+    window.scrollTo({
+        top: 0,
+        behavior: 'smooth', // Smooth scroll
+      });
+}

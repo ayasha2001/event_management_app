@@ -11,6 +11,8 @@ import LoadingDots from "../utility/LoadingDots/LoadingDots";
 //Other Imports
 import {addEventFormConfig,addEventFormValidationSchema} from "./config/addEventFormConfig";
 import { FB_BASE_URL, FB_UPDATE_URL } from "../utility/constants";
+import { useDispatch,useSelector } from "react-redux";
+import { setSelectedEvent } from "../store/eventSlice";
 
 
 const addEventFormInitialValues = {
@@ -21,7 +23,9 @@ const addEventFormInitialValues = {
   capacity: "",
 };
 
-const AddEventForm = ({ fetchEvents, selectedEvent, setSelectedEvent }:any) => {
+const AddEventForm = ({ fetchEvents }:any) => {
+  const dispatch = useDispatch()
+  const {selectedEvent } = useSelector((state:any) => state.events);
   const [isSubmitting, setIsSubmitting] = useState(false);
   
   const handleSubmitForm = async (values: any, { resetForm }: any) => { 
@@ -42,7 +46,7 @@ const AddEventForm = ({ fetchEvents, selectedEvent, setSelectedEvent }:any) => {
           'Content-Type': 'application/json',
         },
       });
-      setSelectedEvent(null)
+      dispatch(setSelectedEvent(null))
       resetForm(); // Clears the form
       fetchEvents();
     } catch (error) {
@@ -68,7 +72,6 @@ const AddEventForm = ({ fetchEvents, selectedEvent, setSelectedEvent }:any) => {
             handleBlur,
             touched,
             handleChange,
-            setFieldValue,
           }: any = context;
 
           return (

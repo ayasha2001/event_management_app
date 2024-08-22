@@ -36,7 +36,7 @@ export const addEventFormConfig = [
 
 export const addEventFormValidationSchema = Yup.object({
   event: Yup.string()
-    .max(100, 'Event name is too long')
+    .max(20, 'Event name is too long')
     .required('Event name is required'),
 
   date: Yup.date()

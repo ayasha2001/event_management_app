@@ -8,17 +8,8 @@
   }
   export interface IEventCardProps {
     event: IEvent;
-    onEditClick: (event: IEvent) => void;
-    onDeleteClick: (id: string) => void;
-    setViewDetail: (view: boolean) => void;
-    setSelectedEvent: (event: IEvent) => void;
-  }
-  export interface IEventListProps {
-    events: IEvent[];
-    isFetchingEvents: boolean;
-    onEditClick: (event: IEvent) => void;
-    onDeleteClick: (id: string) => void;
-    setViewDetail: (view: boolean) => void;
-    setSelectedEvent: (event: IEvent) => void;
   }
  
+  export interface IEventsState {
+    events: Event[];
+  }
