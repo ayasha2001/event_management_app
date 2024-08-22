@@ -1,26 +1,64 @@
 // Base Imports
-import React from "react";
+import React,{useState} from "react";
+
+// Package Imports
+import axios from "axios";
+import { Formik } from "formik";
+
+// Component Imports
+import LoadingDots from "../utility/LoadingDots/LoadingDots";
 
 //Other Imports
-import { Formik } from "formik";
-import { addEventFormConfig, addEventFormValidationSchema, addEventFormInitialValues } from "./config/addEventFormConfig";
+import {addEventFormConfig,addEventFormValidationSchema} from "./config/addEventFormConfig";
+import { FB_BASE_URL, FB_UPDATE_URL } from "../utility/constants";
 
 
-const AddEventForm = () => {
+const addEventFormInitialValues = {
+  event: "",
+  date: "",
+  location: "",
+  description: "",
+  capacity: "",
+};
 
-    const handleSubmitForm = (values: any) => {
-      console.log(values);
-      // Add your form submission logic here
-    };
+const AddEventForm = ({ fetchEvents, selectedEvent, setSelectedEvent }:any) => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  
+  const handleSubmitForm = async (values: any, { resetForm }: any) => { 
+    setIsSubmitting(true);
+    try {
+      let response;
+      const url = selectedEvent
+        ? `${FB_UPDATE_URL}/${selectedEvent?.id}.json`  // URL for updating an existing event
+        : FB_BASE_URL;  // URL for creating a new event
+      
+      const method = selectedEvent ? "PUT" : "POST";  
+      
+      response = await axios({
+        method,
+        url,
+        data: values,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      setSelectedEvent(null)
+      resetForm(); // Clears the form
+      fetchEvents();
+    } catch (error) {
+      console.error(`${selectedEvent ? 'Error updating event' : 'Error adding event'}:`, error);
+    } finally {
+      setIsSubmitting(false);  // Reset submitting state
+    }
+  };
 
   return (
-    <div>
+    <div className="flex justify-center">
       <Formik
-        initialValues={addEventFormInitialValues}
+        initialValues={selectedEvent || addEventFormInitialValues}
         validationSchema={addEventFormValidationSchema}
-        onSubmit={(values) => {
-          handleSubmitForm(values);
-        }}
+        onSubmit={handleSubmitForm}
+        enableReinitialize
       >
         {(context) => {
           const {
@@ -36,8 +74,9 @@ const AddEventForm = () => {
           return (
             <form
               onSubmit={handleSubmit}
-              className="sm:my-10 w-full lg:w-[40vw] bg-white rounded-lg p-4"
+              className="sm:my-10 w-full lg:w-[40vw] bg-white rounded-lg p-4 border-gray-500 shadow-md"
             >
+              <h2 className="font-bold text-xl text-center uppercase my-4">Add an event</h2>
               {addEventFormConfig?.map((field, idx) => (
                 <div key={idx} className="mb-4">
                   {field?.type === "textarea" ? (
@@ -48,7 +87,7 @@ const AddEventForm = () => {
                       onBlur={handleBlur}
                       onChange={handleChange}
                       rows={4}
-                      className="w-full px-3 py-2 border border-gray-300 overflow-y-auto rounded-sm focus:outline-none focus:border-themeRed"
+                      className="w-full px-3 py-2 border border-gray-300 overflow-y-auto rounded-sm focus:outline-none focus:border-[1px]"
                     />
                   ) : (
                     <input
@@ -58,19 +97,25 @@ const AddEventForm = () => {
                       value={values[field?.name]}
                       onBlur={handleBlur}
                       onChange={handleChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-sm focus:outline-none focus:border-themeRed"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-sm focus:outline-none focus:border-[1px]"
                     />
                   )}
                   {errors[field?.name] && touched[field?.name] && (
-                    <p className="text-sm text-themeRed">
+                    <p className="text-sm text-red-900">
                       {errors[field?.name]}
                     </p>
                   )}
                 </div>
               ))}
 
-              <button type="submit" className="btn-red">
-                Add Event
+              <button
+                type="submit"
+                disabled={isSubmitting} // Disable button during submission
+                className={`w-full rounded h-10 uppercase font-bold my-4 ${
+                  isSubmitting ? 'bg-gray-400 cursor-not-allowed' : 'bg-emerald-300 hover:opacity-85'
+                }`}
+              >
+                {isSubmitting ? <LoadingDots /> : 'Add Event'} {/* Show loading text while submitting */}
               </button>
             </form>
           );

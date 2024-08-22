@@ -2,13 +2,14 @@
 import React from 'react';
 
 // Component Imports
-import AddEventForm from './components/AddEventForm';
-import EventList from './components/EventList';
+import Header from './components/Header';
+import Home from './pages/Home';
 
 function App() {
   return (
     <div className="App">
-      <AddEventForm/>
+      <Header/>
+      <Home/>
     </div>
   );
 }
