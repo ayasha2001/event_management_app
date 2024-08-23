@@ -41,7 +41,7 @@ describe('EventList Component', () => {
     );
 
     // Check that EventCard components are rendered for each event
-    expect(screen.queryByAltText('no-record-found')).toBeNull();; // Adjust as needed
+    expect(screen.queryByAltText('no-record-found')).toBeNull();
    
   });
 });

@@ -13,6 +13,7 @@ import {addEventFormConfig,addEventFormValidationSchema} from "./config/addEvent
 import { FB_BASE_URL, FB_UPDATE_URL } from "../utility/constants";
 import { useDispatch,useSelector } from "react-redux";
 import { setSelectedEvent } from "../store/eventSlice";
+import { ADD_EVENT_TITLE_TEXT } from "../utility/textVariables";
 
 
 const addEventFormInitialValues = {
@@ -79,7 +80,7 @@ const AddEventForm = ({ fetchEvents }:any) => {
               onSubmit={handleSubmit}
               className="sm:my-10 w-full lg:w-[40vw] bg-white rounded-lg p-4 border-gray-500 shadow-md"
             >
-              <h2 className="font-bold text-xl text-center uppercase my-4">Add an event</h2>
+              <h2 className="font-bold text-xl text-center uppercase my-4">{ADD_EVENT_TITLE_TEXT}</h2>
               {addEventFormConfig?.map((field, idx) => (
                 <div key={idx} className="mb-4">
                   {field?.type === "textarea" ? (
@@ -118,7 +119,7 @@ const AddEventForm = ({ fetchEvents }:any) => {
                   isSubmitting ? 'bg-gray-400 cursor-not-allowed' : 'bg-emerald-300 hover:opacity-85'
                 }`}
               >
-                {isSubmitting ? <LoadingDots /> : 'Add Event'} {/* Show loading text while submitting */}
+                {isSubmitting ? <LoadingDots /> : 'Add Event'}
               </button>
             </form>
           );

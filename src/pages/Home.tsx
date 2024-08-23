@@ -1,5 +1,5 @@
 // Base Imports
-import React, { useEffect } from "react";
+import React, { useState, useEffect } from "react";
 
 // Package Imports
 import axios from "axios";
@@ -15,11 +15,12 @@ import Modal from "../components/common/Modal";
 
 // Other Imports
 import { FB_BASE_URL, FB_UPDATE_URL, ModalType } from "../utility/constants";
-import { EVENT_LIST_TITLE_TEXT } from "../utility/textVariables";
+import { ERROR_ALERT_TEXT, EVENT_LIST_TITLE_TEXT } from "../utility/textVariables";
 import { closeModal } from "../store/modalSlice";
 
 
 const Event = () => {
+  const [ isResSuccess, setIsResSuccess ] = useState(true)
   const dispatch = useDispatch();
   const { isOpen, type }:any = useSelector((state:any) => state.modal.modal)
   const eventToDelete = useSelector((state:any) => state.events.eventToDelete)
@@ -32,19 +33,20 @@ const Event = () => {
     try {
       dispatch(setIsFetchingEvents(true))
       const response = await axios.get(FB_BASE_URL);
-      const data = response.data;
+      const data = response?.data;
       if(!data){
         dispatch(setEvents([]));
         return
       }
-      const fetchedEvents = Object.keys(data).map(key => ({
+      const fetchedEvents = Object.keys(data)?.map(key => ({
         id: key,
         ...data[key],
       }));
-      console.log(fetchedEvents)
       dispatch(setEvents(fetchedEvents));
     } catch (error) {
-      console.error('Error fetching events:', error);
+      setIsResSuccess(false)
+      setTimeout(() => setIsResSuccess(true), 3000)
+      console.error(error);
     } finally {
       dispatch(setIsFetchingEvents(false))
     }
@@ -56,7 +58,7 @@ const Event = () => {
         await axios.delete(`${FB_UPDATE_URL}/${eventToDelete?.id}.json`);
         fetchEvents();
       } catch (error) {
-        console.error('Error deleting event:', error);
+        console.error(error);
       }
     }
     dispatch(closeModal())
@@ -68,6 +70,7 @@ const Event = () => {
   return (
     <div>
       <AddEventForm fetchEvents={fetchEvents}/>
+      { !isResSuccess && <p className='text-center my-4 text-red-400'>{ERROR_ALERT_TEXT}</p> }
       <h2 className="text-center text-[36px] sm:text-[40px] my-10 sm:my-0 sm:mb-10 uppercase font-semibold text-gray-900">{EVENT_LIST_TITLE_TEXT}</h2>
       <EventList />
       <Modal isOpen={isOpen}>

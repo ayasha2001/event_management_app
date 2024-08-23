@@ -39,7 +39,7 @@ const EventCard: React.FC<IEventCardProps> = ({event}) => {
 
   return (
     <>
-    <div className="relative flex flex-col w-96 md:w-80 lg-w-96 items-center border-gray-500 rounded-lg shadow-md p-8">
+    <div className="relative flex flex-col w-80 md:w-80 items-center border-gray-500 rounded-lg shadow-md p-4 my-4">
       <h2 className="text-3xl font-bold">{event?.event}</h2>
       <p className="font-light text-gray-500 text-sm">{dateFormat}</p>
       <p className="">{event?.location}</p>
