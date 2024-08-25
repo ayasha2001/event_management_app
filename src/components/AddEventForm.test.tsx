@@ -15,11 +15,6 @@ const axiosPostMock = axios.post as jest.Mock;
 const fetchEvents = vi.fn();
 
 describe("AddEventForm", () => {
-  beforeEach(() => {
-    fetchEvents.mockClear();
-    axiosPostMock.mockClear(); // Clear the axios.post mock
-    vi.clearAllMocks(); // Clear all mocks before each test
-  });
 
   it("renders form fields correctly", () => {
     render(
