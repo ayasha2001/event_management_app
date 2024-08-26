@@ -1,47 +1,57 @@
-import { render, screen, waitFor } from '@testing-library/react';
-import { Provider } from 'react-redux';
-import { createStore } from 'redux';
-import { describe, it, expect, vi } from 'vitest';
-import EventList from './EventList';
-import reducer from '../store/eventSlice'; 
+import { render, screen } from "@testing-library/react";
+import { Provider } from "react-redux";
+import configureStore from 'redux-mock-store';
+import store from "../store/store"
+import EventList from "./EventList";
+import LoadingDots from "../utility/LoadingDots/LoadingDots";
+import { NO_EVENT_FOUND_TEXT } from "../utility/textVariables";
+import { IEvent } from "../components/interfaces/Event";
 
 // Create a mock store
-const store = createStore(reducer);
+const mockStore = configureStore([]);
 
-describe('EventList Component', () => {
+describe("EventList", () => {
 
-  it('displays no events message when there are no events', () => {
-    // Set up the store to indicate no events are available
-    const mockStore = createStore((state = { events: { isFetchingEvents: false, events: [] } }) => state);
+  it("shows no events found message when there are no events", () => {
+    const store = mockStore({
+      events: {
+        isFetchingEvents: false,
+        events: []
+      }
+    });
 
     render(
-      <Provider store={mockStore}>
+      <Provider store={store}>
         <EventList />
       </Provider>
     );
 
-    expect(screen.getByAltText('no-record-found')).toBeInTheDocument();
-    expect(screen.getByText('Uh! Oh! No events Found.')).toBeInTheDocument();
+    expect(screen.getByAltText(/no-record-found/i)).toBeInTheDocument();
+    expect(screen.getByText(NO_EVENT_FOUND_TEXT)).toBeInTheDocument();
   });
 
-  it('renders event cards when events are available', async () => {
-    
-    const mockEvents = [
-      { id: 1, name: 'Event 1' },
-      { id: 2, name: 'Event 2' }
+  it("displays a list of events when events are available", () => {
+    const mockEvents: IEvent[] = [
+      { id: '1', event: 'Event 1', date: '2024-09-01', location: 'Location 1', description: 'Description 1', capacity: 100 },
+      { id: '2', event: 'Event 2', date: '2024-09-02', location: 'Location 2', description: 'Description 2', capacity: 200 }
     ];
 
-    // mock store
-    const mockStore = createStore((state = { events: { isFetchingEvents: false, events: mockEvents } }) => state);
+    const store = mockStore({
+      events: {
+        isFetchingEvents: false,
+        events: mockEvents
+      }
+    });
 
     render(
-      <Provider store={mockStore}>
+      <Provider store={store}>
         <EventList />
       </Provider>
     );
 
-    // Check that EventCard components are rendered for each event
-    expect(screen.queryByAltText('no-record-found')).toBeNull();
-   
+    // Check if EventCard components are rendered
+    mockEvents.forEach((event) => {
+      expect(screen.getByText(event.event)).toBeInTheDocument();
+    });
   });
 });

@@ -26,7 +26,7 @@ const addEventFormInitialValues = {
 
 const AddEventForm = ({ fetchEvents }:any) => {
   const dispatch = useDispatch()
-  const {selectedEvent } = useSelector((state:any) => state.events);
+  const {selectedEvent} = useSelector((state:any) => state.events);
   const [isSubmitting, setIsSubmitting] = useState(false);
   
   const handleSubmitForm = async (values: any, { resetForm }: any) => { 

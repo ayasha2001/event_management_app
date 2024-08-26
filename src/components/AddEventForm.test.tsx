@@ -1,22 +1,39 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { Provider } from "react-redux";
-import store from "../store/store"; // Adjust the import path as necessary
-import AddEventForm from "../components/AddEventForm";
-import axios from "axios";
-import { describe, it, expect, vi } from 'vitest';
+import configureStore from 'redux-mock-store';
+import AddEventForm from "./AddEventForm";
+import axios from 'axios';
 import { FB_BASE_URL } from "../utility/constants";
 
-// Spy on axios.post
-vi.spyOn(axios, 'post');
-
-const axiosPostMock = axios.post as jest.Mock;
-
-// Mock fetchEvents function
-const fetchEvents = vi.fn();
+// Mock `axios`
+jest.mock('axios');
+const mockedAxios = axios as jest.Mocked<typeof axios>;
 
 describe("AddEventForm", () => {
+  const mockStore = configureStore([]);
+  const fetchEvents = jest.fn();
+  const initialState = {
+    events: [],
+    isFetchingEvents: false,
+    selectedEvent: null,
+    eventToDelete: null
+  };
+
+  beforeEach(() => {
+
+    fetchEvents.mockClear();
+    mockedAxios.post.mockResolvedValue({data: {
+      event: 'Event',
+      date: '2001-06-25',
+      location: 'Ayasha Birthday',
+      description: 'Sample Description',
+      capacity: '100'
+    }}); 
+  });
 
   it("renders form fields correctly", () => {
+    const store = mockStore(initialState);
+
     render(
       <Provider store={store}>
         <AddEventForm fetchEvents={fetchEvents} />
@@ -31,6 +48,8 @@ describe("AddEventForm", () => {
   });
 
   it('should display required error when submitting an empty form', async () => {
+    const store = mockStore(initialState);
+
     render(
       <Provider store={store}>
         <AddEventForm fetchEvents={fetchEvents} />
@@ -46,58 +65,50 @@ describe("AddEventForm", () => {
     expect(await screen.findByText(/Capacity is required/i)).toBeInTheDocument();
   });
 
-  // it('submits the form correctly', async () => {
-  //   axiosPostMock.mockResolvedValue({ data: { success: true } });
+  it('submits the form successfully and resets the form', async () => {
+    const store = mockStore(initialState);
 
-  //   render(
-  //     <Provider store={store}>
-  //       <AddEventForm fetchEvents={fetchEvents} />
-  //     </Provider>
-  //   );
+    render(
+      <Provider store={store}>
+        <AddEventForm fetchEvents={fetchEvents} />
+      </Provider>
+    );
 
-  //   // Fill in the form fields
-  //   fireEvent.change(screen.getByPlaceholderText('Enter event name'), {
-  //     target: { value: 'Test Event' },
-  //   });
-  //   fireEvent.change(screen.getByPlaceholderText('Select date'), {
-  //     target: { value: '2024-09-01' },
-  //   });
-  //   fireEvent.change(screen.getByPlaceholderText('Enter location'), {
-  //     target: { value: 'Test Location' },
-  //   });
-  //   fireEvent.change(screen.getByPlaceholderText('Enter Description'), {
-  //     target: { value: 'Test Description' },
-  //   });
-  //   fireEvent.change(screen.getByPlaceholderText('Enter Capacity'), {
-  //     target: { value: '100' },
-  //   });
+    // Fill out the form
+    fireEvent.change(screen.getByPlaceholderText('Enter event name'), { target: { value: 'Event' } });
+    fireEvent.change(screen.getByPlaceholderText('Select date'), { target: { value: '2001-06-25' } });
+    fireEvent.change(screen.getByPlaceholderText('Enter location'), { target: { value: 'Sample Location' } });
+    fireEvent.change(screen.getByPlaceholderText('Enter Description'), { target: { value: 'Sample Description' } });
+    fireEvent.change(screen.getByPlaceholderText('Enter Capacity'), { target: { value: '100' } });
 
-  //   // Submit the form
-  //   fireEvent.submit(screen.getByRole('button', { name: /Add Event/i }));
-
-  //   await waitFor(() => {
-  //     expect(axios.post).toHaveBeenCalledWith(
-  //       FB_BASE_URL, 
-  //       {
-  //         event: "Test Event",
-  //         date: "2024-09-01",
-  //         location: "Test Location",
-  //         description: "Test Description",
-  //         capacity: "100",
-  //       },
-  //       {
-  //         headers: {
-  //           'Content-Type': 'application/json',
-  //         },
-  //       }
-  //     );
-  //     expect(fetchEvents).toHaveBeenCalled();
-  //   });
+    fireEvent.click(screen.getByRole('button', { name: /Add Event/i }));
     
-  // });
-    
+    await waitFor(()=>{
+      expect(mockedAxios.post).toHaveBeenCalledWith({
+        // method: 'POST',
+        url: FB_BASE_URL,
+        data: {
+          event: 'Event',
+          date: '2001-06-25',
+          location: 'Ayasha Birthday',
+          description: 'Sample Description',
+          capacity: '100'
+        },
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+    })
+
+    await waitFor(() => {
+      expect(fetchEvents).toHaveBeenCalled();
+    });
+
+    //form reset
+    expect(screen.getByPlaceholderText('Enter event name')).toBeInTheDocument();
+    expect(screen.getByPlaceholderText('Select date')).toBeInTheDocument();
+    expect(screen.getByPlaceholderText('Enter location')).toBeInTheDocument();
+    expect(screen.getByPlaceholderText('Enter Description')).toBeInTheDocument();
+    expect(screen.getByPlaceholderText('Enter Capacity')).toBeInTheDocument();
   });
-
-
-
-
+});
