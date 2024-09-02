@@ -7,7 +7,7 @@ import { IEvent, IEventCardProps } from "./interfaces/Event";
 // Other Imports
 import {PencilSquareIcon, TrashIcon } from "@heroicons/react/16/solid";
 import { CAPACITY_TITLE_TEXT, VIEW_DETAILS_TEXT } from "../utility/textVariables";
-import { scrollToTop, updateDateFormat } from "../utility/utils";
+import { scrollToTop, stripHtmlTags, updateDateFormat } from "../utility/utils";
 import { useDispatch } from "react-redux";
 import { setSelectedEvent,setEventToDelete } from "../store/eventSlice";
 import { openModal } from "../store/modalSlice";
@@ -44,7 +44,7 @@ const EventCard: React.FC<IEventCardProps> = ({event}) => {
       <p className="font-light text-gray-500 text-sm">{dateFormat}</p>
       <p className="">{event?.location}</p>
       <p className="text-emerald-500 font-bold text-left uppercase">{CAPACITY_TITLE_TEXT}: {event?.capacity}</p>
-      <p className="text-lg align-center line-clamp-1 my-4">{event?.description}</p>
+      <p className="text-lg align-center line-clamp-1 my-4">{stripHtmlTags(event?.description)}</p>
       <button onClick={handleViewDtl} className="w-full bg-emerald-300 rounded h-10 uppercase font-bold my-4 hover:opacity-85">{VIEW_DETAILS_TEXT}</button>
       <div className="absolute right-4 top-2 w-4 hover:cursor-pointer" onClick={() => handleEditClick(event)}><PencilSquareIcon className='w-6 h-6 hover:opacity-85 hover:scale-110'/></div>
       <div className="absolute right-4 top-10 w-4 hover:cursor-pointer "onClick={() => handleDeleteClick()}><TrashIcon className='w-6 h-6 hover:opacity-85 hover:scale-110'/></div>

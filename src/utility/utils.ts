@@ -10,3 +10,8 @@ export const scrollToTop = ()=> {
         behavior: 'smooth', // Smooth scroll
       });
 }
+
+export const stripHtmlTags = (html: string): string => {
+    return html.replace(/<\/?[^>]+>/gi, '');
+  };
+  
