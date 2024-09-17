@@ -19,5 +19,5 @@ export const textEditorModules = {
     "header", "height", "bold", "italic",
     "underline", "strike", "blockquote",
     "list", "color", "bullet", "indent",
-    "link", "image", "align", "size",
+    "align", "size",
   ];
